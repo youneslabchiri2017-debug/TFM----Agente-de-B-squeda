@@ -35,9 +35,3 @@ def obtener_texto_wikipedia(urls):
     return text_list
 
 
-txt = obtener_texto_wikipedia(buscar_wikipedia_paginas("honey", n=1))
-
-for info in txt:
-    print(info)
-    print()
-    print()

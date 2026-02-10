@@ -22,7 +22,4 @@ def get_knowledge_from_wikidata(termino):
     return response.json()["results"]["bindings"]
 
 
-termino = "miel"
-print(f"Buscando {termino}...")
 
-knowledge_wiki = get_knowledge_from_wikidata(termino)
