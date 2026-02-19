@@ -15,3 +15,10 @@ class Search_Master():
         self.knowledge['wikidata'] = self.wikidata_searcher.search(term)
         self.knowledge['wikipedia'] = self.wikipedia_searcher.search(term)
         self.knowledge['general'] = self.general_searcher.search(term)
+        return self.knowledge
+
+data = Search_Master().__search_knowledge__("honey")
+for search in data.values():
+    for triple in search:
+        print(triple)
+
