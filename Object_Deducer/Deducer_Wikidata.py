@@ -4,19 +4,9 @@ from Object_Deducer.Deducer import Deducer
 class Deducer_Wikidata(Deducer):
 
     def __init__(self):
+        super().__init__()
         self.url_wikidata = "https://www.wikidata.org/w/api.php"
-        self.super_wiki_url = API_URL = "https://www.wikidata.org/wiki/Special:EntityData/{}.json"
-        self.ROOT_CLASSES = {
-            'Q5': 'person',
-            'Q2095': 'food',
-            'Q571': 'book',
-            'Q11424': 'film',
-            'Q4830453': 'business',
-            'Q16521': 'taxon',  # Animales, plantas, etc.
-            'Q11173': 'chemical compound',
-            'Q4022': 'river',
-            'Q515': 'city'
-        }
+        self.super_wiki_url = "https://www.wikidata.org/wiki/Special:EntityData/{}.json"
         self.headers = {
             'User-Agent': 'MiBot'
         }
@@ -100,7 +90,7 @@ class Deducer_Wikidata(Deducer):
         claims = self.__get_claims__(object_id)
         if 'P31' in claims and claims['P31'][0]['mainsnak']['datavalue']['value']['id'] in self.ROOT_CLASSES:
             return (claims['P31'][0]['mainsnak']['datavalue']['value']['id'])
-        elif 'P279' in claims and claims['P31'][0]['mainsnak']['datavalue']['value']['id'] in self.ROOT_CLASSES:
+        elif 'P279' in claims and claims['P279'][0]['mainsnak']['datavalue']['value']['id'] in self.ROOT_CLASSES:
             return (self.ROOT_CLASSES[id], id)
         else:
             return self.__is_in_set__(object_id)
@@ -116,3 +106,8 @@ class Deducer_Wikidata(Deducer):
                 entitie['in_set'] = d_id
                 results.append(entitie)
         return results
+
+ded = Deducer_Wikidata()
+results = ded.deduce_object('nintendo')
+for res in results:
+    print(f"{res['id']} - {ded.ROOT_CLASSES[res['in_set']]}")
