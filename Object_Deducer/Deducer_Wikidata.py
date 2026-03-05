@@ -96,18 +96,17 @@ class Deducer_Wikidata(Deducer):
             return self.__is_in_set__(object_id)
 
 
-    def deduce_object(self, term):
+    def __deduce_object_wikidata__(self, term):
         entities = self.__search_wikidata_objects__(term)
         results = []
         for entitie in entities:
             id = entitie['id']
             d_id = self.__deduce_type_wikidata__(id)
             if d_id and d_id in self.ROOT_CLASSES:
-                entitie['in_set'] = d_id
-                results.append(entitie)
+                results.append(d_id)
         return results
 
-ded = Deducer_Wikidata()
-results = ded.deduce_object('nintendo')
-for res in results:
-    print(f"{res['id']} - {ded.ROOT_CLASSES[res['in_set']]}")
+    def deduce_object(self, term):
+        results = self.__deduce_object_wikidata__(term.term)
+        term.term_categories = results
+        super().deduce_object(term)

@@ -1,5 +1,5 @@
 import spacy, re
-from Knowledge_Search.Transformers.Transformer import Transformer
+from Web_Searcher.Transformers.Transformer import Transformer
 
 class Text_Transformer(Transformer):
 

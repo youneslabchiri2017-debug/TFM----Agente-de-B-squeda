@@ -1,7 +1,7 @@
 import requests
 import trafilatura
 from bs4 import BeautifulSoup
-from Knowledge_Search.Transformers.Transformer import Transformer
+from Web_Searcher.Transformers.Transformer import Transformer
 
 class HTML_Transformer(Transformer):
 

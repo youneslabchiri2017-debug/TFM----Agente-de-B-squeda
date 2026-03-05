@@ -1,7 +1,6 @@
-from Knowledge_Search.Searchers.Searcher import Searcher
 import requests
 
-class WikiData_Searcher(Searcher):
+class WikiData_Searcher():
 
     def __get_knowledge_from_wikidata__(self, term):
         url = "https://query.wikidata.org/sparql"
@@ -33,3 +32,7 @@ class WikiData_Searcher(Searcher):
 
     def search(self, term):
         return self.__get_knowledge_from_wikidata__(term)
+
+
+res = WikiData_Searcher().search("Oscar Corcho")
+print(res)

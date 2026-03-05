@@ -1,4 +1,4 @@
-
+from Specific_Searcher.Search_Master import SearchMaster
 
 class Deducer():
 
@@ -15,6 +15,7 @@ class Deducer():
             'Q515': 'city',
             'Q6256': 'country'
         }
+        self.searcher = SearchMaster()
 
     def deduce_object(self, term):
-        pass
+        self.searcher.search_by_category(term)
