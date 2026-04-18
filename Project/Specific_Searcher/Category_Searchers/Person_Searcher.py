@@ -1,4 +1,4 @@
-from Specific_Searcher.Category_Searchers.Category_Searcher import Category_Searcher
+from Project.Specific_Searcher.Category_Searchers.Category_Searcher import Category_Searcher
 
 
 class Person_Searcher(Category_Searcher):
@@ -9,7 +9,7 @@ class Person_Searcher(Category_Searcher):
 
     def search(self, term):
         super().search(term)
-        print("Funca?")
+        #Busqueda especifica
 
     def __search_person__(self):
         pass

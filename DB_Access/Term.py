@@ -5,6 +5,7 @@ class Term():
     def __init__(self, term=""):
         self.term = term
         self.term_categories = []
+        self.filtered_data = []
         self.data = {}
         self.visited_urls = []
 

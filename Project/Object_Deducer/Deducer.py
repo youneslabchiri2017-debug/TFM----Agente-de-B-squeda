@@ -1,4 +1,4 @@
-from Specific_Searcher.Search_Master import SearchMaster
+from Project.Specific_Searcher.Search_Master import SearchMaster
 
 class Deducer():
 

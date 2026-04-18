@@ -1,6 +1,6 @@
-from Specific_Searcher.Category_Searchers.Taxon_Searcher import Taxon_Searcher
-from Specific_Searcher.Category_Searchers.Person_Searcher import Person_Searcher
-from Specific_Searcher.Category_Searchers.Place_Searcher import Place_Searcher
+from Project.Specific_Searcher.Category_Searchers.Taxon_Searcher import Taxon_Searcher
+from Project.Specific_Searcher.Category_Searchers.Person_Searcher import Person_Searcher
+from Project.Specific_Searcher.Category_Searchers.Place_Searcher import Place_Searcher
 
 
 class SearchMaster():

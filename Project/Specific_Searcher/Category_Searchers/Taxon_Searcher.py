@@ -1,4 +1,4 @@
-from Specific_Searcher.Category_Searchers.Category_Searcher import Category_Searcher
+from Project.Specific_Searcher.Category_Searchers.Category_Searcher import Category_Searcher
 
 class Taxon_Searcher(Category_Searcher):
 

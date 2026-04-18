@@ -4,7 +4,7 @@ from Web_Searcher.Transformers.Transformer import Transformer
 class Text_Transformer(Transformer):
 
     def __init__(self):
-        self.nlp = spacy.load("en_core_web_lg")
+        self.nlp = spacy.load("en_core_web_sm")
 
     def normalize(self, s):
         return re.sub(r"\s+", " ", s.strip())

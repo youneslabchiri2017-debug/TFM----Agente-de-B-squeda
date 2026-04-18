@@ -32,7 +32,3 @@ class WikiData_Searcher():
 
     def search(self, term):
         return self.__get_knowledge_from_wikidata__(term)
-
-
-res = WikiData_Searcher().search("Oscar Corcho")
-print(res)

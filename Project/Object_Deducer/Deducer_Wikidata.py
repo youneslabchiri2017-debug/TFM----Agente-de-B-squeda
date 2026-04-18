@@ -1,5 +1,5 @@
 import requests
-from Object_Deducer.Deducer import Deducer
+from Project.Object_Deducer.Deducer import Deducer
 
 class Deducer_Wikidata(Deducer):
 
@@ -107,6 +107,7 @@ class Deducer_Wikidata(Deducer):
         return results
 
     def deduce_object(self, term):
-        results = self.__deduce_object_wikidata__(term.term)
-        term.term_categories = results
+        term.term_categories = self.__deduce_object_wikidata__(term.term)
         super().deduce_object(term)
+
+

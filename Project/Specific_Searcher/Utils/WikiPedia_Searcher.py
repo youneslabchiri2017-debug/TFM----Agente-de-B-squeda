@@ -1,11 +1,10 @@
 import requests
-
 from Web_Searcher.Text_Searchers.Text_Searcher import TextSearcher
 
 class Wikipedia_Searcher(TextSearcher):
 
     def __init__(self):
-        super(TextSearcher, self).__init__()
+        super().__init__()
 
     def __search_wikipedia_pages__(self, termino, n=5):
         url = "https://en.wikipedia.org/w/api.php"
