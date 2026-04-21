@@ -22,7 +22,7 @@ class DBpedia_Searcher():
             FILTER(LANG(?valueLabel) = "en")
           }}
         }}
-        LIMIT 50
+        LIMIT 200
         """
 
         headers = {
