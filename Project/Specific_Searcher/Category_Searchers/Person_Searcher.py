@@ -6,6 +6,7 @@ class Person_Searcher(Category_Searcher):
     def __init__(self):
         super(Person_Searcher, self).__init__()
         self.attributes_to_search[''] = ""
+        self.id_cat = 'Q5'
 
     def search(self, term):
         super().search(term)

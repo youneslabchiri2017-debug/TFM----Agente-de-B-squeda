@@ -24,11 +24,11 @@ class WikiData_Searcher():
 
         if response.status_code != 200:
             return None
-        else:
-            data = []
-            for line in response.json()["results"]["bindings"]:
-                data.append((term, line["propiedadNombre"]["value"], line["objetoNombre"]["value"]))
-            return data
+
+        data = []
+        for line in response.json()["results"]["bindings"]:
+            data.append((term, line["propiedadNombre"]["value"], line["objetoNombre"]["value"]))
+        return data
 
     def search(self, term):
         return self.__get_knowledge_from_wikidata__(term)

@@ -10,9 +10,13 @@ class Ontology_Master:
     # Se tiene que crear un nuevo grafo a partir del objeto "Termino"
     def create_graph(self, terms):
         # Persona
-        for category in terms.term_categories:
-            if category in self.ontologys:
-                ontology = self.ontologys[category](terms)
+        for key_id in terms.filtered_data:
+            cat = key_id.split('-')[0]
+            if cat in self.ontologys:
+                ontology = self.ontologys[cat](terms, key_id)
+                ontology.draw_limited_graph(terms.term)
+                terms.ontologyes[key_id] = ontology
+        print(f"Tenemos {len(terms.ontologyes)} ontologias listas")
 
     # Combina lo que ya existe con los nuevos datos recolectados
     def combine_knowledge(self, new_knowledge, old_knowledge):

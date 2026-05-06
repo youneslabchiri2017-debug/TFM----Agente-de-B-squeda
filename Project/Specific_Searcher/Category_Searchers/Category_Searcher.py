@@ -11,6 +11,7 @@ class Category_Searcher():
         self.dbpedia_searcher = DBpedia_Searcher()
         self.wikipedia_searcher = Wikipedia_Searcher()
         self.attributes_to_search = {}
+        self.id_cat = None
 
     def __search_pages__(self, term, max_res=5):
         with DDGS() as ddgs:
@@ -18,8 +19,18 @@ class Category_Searcher():
         return list(map(lambda x: x['href'], results))
 
     def search(self, term):
-        term.data['wikidata'] = self.wiki_searcher.search(term.term)
-        term.data['dbpedia'] = self.dbpedia_searcher.search(term.term)
-        term.data['wikipedia'] = self.wikipedia_searcher.search(term.term)
-        print()
+        for key in term.data:
+            if self.id_cat == key.split('-')[0]:
+                try:
+                    term.data[key]['wikidata'] = self.wiki_searcher.search(term.term)
+                except Exception as e:
+                    print(e)
+                try:
+                    term.data[key]['dbpedia'] = self.dbpedia_searcher.search(term.term)
+                except Exception as e:
+                    print(e)
+                try:
+                    term.data[key]['wikipedia'] = self.wikipedia_searcher.search(term.term)
+                except Exception as e:
+                    print(e)
 

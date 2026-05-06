@@ -32,16 +32,13 @@ class DBpedia_Searcher():
 
         response = requests.get(url, params={"query": query}, headers=headers)
 
-        # 🔍 Debug útil
+        # Debug útil
         if response.status_code != 200:
-            print("Error:", response.status_code)
-            print(response.text)
             return None
 
         json_data = response.json()
 
         if "results" not in json_data:
-            print("Respuesta inesperada:", json_data)
             return None
 
         data = []

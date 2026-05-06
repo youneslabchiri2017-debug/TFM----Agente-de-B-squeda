@@ -17,8 +17,11 @@ class Wikipedia_Searcher(TextSearcher):
             "srsearch": termino,
             "format": "json"
         }
-        r = requests.get(url, params=params, headers=headers)
-        data = r.json()
+        response = requests.get(url, params=params, headers=headers)
+        if response.status_code != 200:
+            return []
+
+        data = response.json()
         results = data["query"]["search"][:n]
 
         return list(map(lambda x: f"https://en.wikipedia.org/wiki/{x['title'].replace(' ', '_')}", results))

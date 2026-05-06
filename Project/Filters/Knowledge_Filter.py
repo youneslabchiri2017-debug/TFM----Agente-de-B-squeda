@@ -5,7 +5,11 @@ class Knowledge_Filter:
         pass
 
     def filter(self, terms):
-        for term in terms.data.values():
-            for tup in term:
-                if terms.term in tup[0] or terms.term in tup[2]:
-                    terms.filtered_data.append(tup)
+        for key_id in terms.data:
+            for key_source in terms.data[key_id]:
+                for tup in terms.data[key_id][key_source]:
+                    if terms.term in tup[0] or terms.term in tup[2]:
+                        if key_id in terms.filtered_data:
+                            terms.filtered_data[key_id].append(tup)
+                        else:
+                            terms.filtered_data[key_id] = [tup]

@@ -1,3 +1,7 @@
+import json
+import os
+import time
+
 import requests
 from Project.Object_Deducer.Deducer import Deducer
 
@@ -5,109 +9,108 @@ class Deducer_Wikidata(Deducer):
 
     def __init__(self):
         super().__init__()
-        self.url_wikidata = "https://www.wikidata.org/w/api.php"
-        self.super_wiki_url = "https://www.wikidata.org/wiki/Special:EntityData/{}.json"
+        self.sparql_url = "https://query.wikidata.org/sparql"
+        self.search_url = "https://www.wikidata.org/w/api.php"
+
+        # Archivo para guardar lo que vamos aprendiendo
+        self.cache_file = "wikidata_cache.json"
+        self.cache = self.__load_cache__()
+
+        # Identificarse correctamente evita bloqueos
         self.headers = {
-            'User-Agent': 'MiBot'
+            'User-Agent': 'MiBotEducativo/1.0 (contacto: y.lacbhiri@alumnos.upm.es)',
+            'Accept': 'application/sparql-results+json'
         }
 
-    def __search_wikidata_objects__(self, term):
+    def __load_cache__(self):
+        if os.path.exists(self.cache_file):
+            with open(self.cache_file, 'r') as f:
+                return json.load(f)
+        return {}
+
+    def __save_cache__(self):
+        with open(self.cache_file, 'w') as f:
+            json.dump(self.cache, f)
+
+    def __search_entities__(self, term):
         params = {
             "action": "wbsearchentities",
             "language": "en",
             "format": "json",
             "search": term
         }
-        data = requests.get(self.url_wikidata, headers=self.headers, params=params).json()
+        try:
+            response = requests.get(self.search_url, headers=self.headers, params=params)
+            if response.status_code == 200:
+                return [item['id'] for item in response.json().get('search', [])]
+        except Exception as e:
+            print(e)
 
-        if data['search']:
-            return data['search']
+        return []
+
+    def __get_root_category__(self, qid):
+        """Usa SPARQL para encontrar a qué ROOT_CLASS pertenece el QID."""
+        # 1. Mirar en caché primero
+        if qid in self.cache:
+            return self.cache[qid]
+
+        # 2. Si no está en caché, preguntar a Wikidata
+        # Esta consulta busca si el objeto es instancia/subclase de nuestras raíces
+        root_ids = " ".join([f"wd:{key}" for key in self.ROOT_CLASSES.keys()])
+
+        query = f"""
+        SELECT ?root WHERE {{
+          VALUES ?root {{ {root_ids} }}
+           wd:{qid} (wdt:P31|wdt:P279)* ?root .
+        }}
+        """
+
+        try:
+            response = requests.get(self.sparql_url, params={'query': query, "format": "json"}, headers=self.headers)
+
+            '''
+            if response.status_code == 429:  # Too many requests
+                print("Esperando 5 segundos por límite de velocidad...")
+                time.sleep(5)
+                return self.__get_root_category__(qid)
+            '''
+
+            if response.status_code != 200:
+                print(f"Error HTTP {response.status_code}: {response.text}")
+                return None
+
+            data = response.json()
+            results = data.get('results', {}).get('bindings', [])
+
+            if results:
+                data = []
+                for result in results:
+                    root_qid = result['root']['value'].split('/')[-1]
+                    data.append(root_qid)
+                self.cache[qid] = data
+                return data
+
+        except Exception as e:
+            print(f"Error deduciendo {qid}: {e}")
+
         return None
 
-    def __get_superclasses__(self, qid):
-        """Devuelve las superclases directas (P279) y las instancias (P31)."""
-        data = requests.get(self.super_wiki_url.format(qid), headers={'User-Agent': 'MiBot'}).json()
-        supers = []
+    def deduce_object(self, term_obj):
+        qids = self.__search_entities__(term_obj.term)
+        found_categories = []
 
-        if data['entities']:
-            entity = data["entities"][qid]
-            claims = entity.get("claims", {})
+        for qid in qids:
+            categorias = self.__get_root_category__(qid)
+            if categorias:
+                found_categories += categorias
 
-            # Instancia de (P31)
-            if "P31" in claims:
-                for claim in claims["P31"]:
-                    try:
-                        supers.append(claim["mainsnak"]["datavalue"]["value"]["id"])
-                    except Exception:
-                        pass
+        # Eliminamos duplicados y actualizamos el objeto term
+        term_obj.set_categories(list(set(found_categories)))
 
+        self.__save_cache__()
 
-            # Subclase de (P279)
-            if "P279" in claims:
-                for claim in claims["P279"]:
-                    try:
-                        supers.append(claim["mainsnak"]["datavalue"]["value"]["id"])
-                    except Exception:
-                        pass
+        # Llamamos al super para que ejecute el searcher.search_by_category(term)
+        super().deduce_object(term_obj)
 
-        return supers
-
-
-    def __get_claims__(self, id):
-        params = {
-            "action": "wbgetentities",
-            "language": "en",
-            "format": "json",
-            "props": "claims",
-            "ids": id
-        }
-        claims = requests.get(self.url_wikidata, headers=self.headers, params=params).json()
-        return claims['entities'][id]['claims']
-
-    def __is_in_set__(self, qid, visited = None):
-        if visited == None:
-            visited = set()
-
-        if qid in self.ROOT_CLASSES:
-            return qid
-
-        if qid in visited:
-            return None
-
-        visited.add(qid)
-
-        to_visit = []
-
-        for super_class in self.__get_superclasses__(qid):
-            if super_class in self.ROOT_CLASSES:
-                return super_class
-            to_visit.append(super_class)
-        for to_v in to_visit:
-            return self.__is_in_set__(to_v, visited)
-
-
-    def __deduce_type_wikidata__(self, object_id):
-        claims = self.__get_claims__(object_id)
-        if 'P31' in claims and claims['P31'][0]['mainsnak']['datavalue']['value']['id'] in self.ROOT_CLASSES:
-            return (claims['P31'][0]['mainsnak']['datavalue']['value']['id'])
-        elif 'P279' in claims and claims['P279'][0]['mainsnak']['datavalue']['value']['id'] in self.ROOT_CLASSES:
-            return (self.ROOT_CLASSES[id], id)
-        else:
-            return self.__is_in_set__(object_id)
-
-
-    def __deduce_object_wikidata__(self, term):
-        entities = self.__search_wikidata_objects__(term)
-        results = []
-        for entitie in entities:
-            id = entitie['id']
-            d_id = self.__deduce_type_wikidata__(id)
-            if d_id and d_id in self.ROOT_CLASSES:
-                results.append(d_id)
-        return results
-
-    def deduce_object(self, term):
-        term.term_categories = self.__deduce_object_wikidata__(term.term)
-        super().deduce_object(term)
 
 
