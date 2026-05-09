@@ -15,6 +15,7 @@ class Ontology_Master:
             if cat in self.ontologys:
                 ontology = self.ontologys[cat](terms, key_id)
                 ontology.draw_limited_graph(terms.term)
+                ontology.draw_graph()
                 terms.ontologyes[key_id] = ontology
         print(f"Tenemos {len(terms.ontologyes)} ontologias listas")
 

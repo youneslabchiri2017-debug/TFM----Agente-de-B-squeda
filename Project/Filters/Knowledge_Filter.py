@@ -8,8 +8,14 @@ class Knowledge_Filter:
         for key_id in terms.data:
             for key_source in terms.data[key_id]:
                 for tup in terms.data[key_id][key_source]:
-                    if terms.term in tup[0] or terms.term in tup[2]:
-                        if key_id in terms.filtered_data:
-                            terms.filtered_data[key_id].append(tup)
+                    if len(tup) == 3:
+                        if terms.term in tup[0] or terms.term in tup[2]:
+                            if key_id in terms.filtered_data:
+                                terms.filtered_data[key_id][0].append(tup)
+                            else:
+                                terms.filtered_data[key_id] = {0:[], 1:[]}
                         else:
-                            terms.filtered_data[key_id] = [tup]
+                            if key_id in terms.filtered_data:
+                                terms.filtered_data[key_id][1].append(tup)
+                            else:
+                                terms.filtered_data[key_id] = {0:[], 1:[]}

@@ -49,4 +49,4 @@ class Wikipedia_Searcher(TextSearcher):
         pages = self.__search_wikipedia_pages__(term, 3)
         for page in pages:
             t_txt += self.__obtain_text_from_pages__(page)
-        return self.transformer.trasnform(t_txt)
+        return self.transformer.transform(t_txt, term)

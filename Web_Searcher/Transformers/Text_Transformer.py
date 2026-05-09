@@ -33,5 +33,11 @@ class Text_Transformer(Transformer):
                     triples.append((self.normalize(subj), token.lemma_, self.normalize(obj)))
         return triples
 
-    def trasnform(self, text):
-        return self.__extract_triples__(text)
+    def transform(self, text, term):
+        tuples = self.__extract_triples__(text)
+        for i in range(len(tuples)):
+            if term in tuples[i][0]:
+                tuples[i][0] = term
+            if term in tuples[i][2]:
+                tuples[i][2] = term
+        return tuples

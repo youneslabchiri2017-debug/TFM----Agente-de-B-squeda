@@ -23,7 +23,7 @@ class WikiData_Searcher():
         response = requests.get(url, params={'query': query}, headers=headers)
 
         if response.status_code != 200:
-            return None
+            return []
 
         data = []
         for line in response.json()["results"]["bindings"]:

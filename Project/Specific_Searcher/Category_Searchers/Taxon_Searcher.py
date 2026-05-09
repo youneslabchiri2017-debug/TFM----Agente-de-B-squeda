@@ -2,8 +2,14 @@ from Project.Specific_Searcher.Category_Searchers.Category_Searcher import Categ
 
 class Taxon_Searcher(Category_Searcher):
 
-    def search(self):
+    def __init__(self):
+        Category_Searcher.__init__(self)
+        self.attributes_to_search[''] = ""
+        self.id_cat = 'Q16521'
+
+    def search(self, term):
         pass
+        #super().search(term)
 
     def __search_taxon__(self):
         pass
