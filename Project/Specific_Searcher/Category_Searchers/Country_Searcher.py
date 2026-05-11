@@ -1,7 +1,7 @@
 from Project.Specific_Searcher.Category_Searchers.Category_Searcher import Category_Searcher
 
 
-class Place_Searcher(Category_Searcher):
+class Country_Searcher(Category_Searcher):
 
     def __init__(self):
         Category_Searcher.__init__(self)
@@ -10,8 +10,7 @@ class Place_Searcher(Category_Searcher):
         self.id_cat = 'Q6256'
 
     def search(self, term):
-        pass
-        #super().search(term)
+        super().search(term)
 
     def __search_place__(self):
         pass

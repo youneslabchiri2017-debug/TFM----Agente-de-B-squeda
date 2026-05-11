@@ -2,7 +2,7 @@ from Project.Filters.Knowledge_Filter import Knowledge_Filter
 from Project.Knowledge_Combiner.Ontology_Master import Ontology_Master
 from Project.Specific_Searcher.Category_Searchers.Taxon_Searcher import Taxon_Searcher
 from Project.Specific_Searcher.Category_Searchers.Person_Searcher import Person_Searcher
-from Project.Specific_Searcher.Category_Searchers.Place_Searcher import Place_Searcher
+from Project.Specific_Searcher.Category_Searchers.Country_Searcher import Country_Searcher
 
 
 class SearchMaster():
@@ -10,7 +10,7 @@ class SearchMaster():
     def __init__(self):
         # Searchers
         self.person_searcher = Person_Searcher()
-        self.place_searcher = Place_Searcher()
+        self.country_Searcher = Country_Searcher()
         self.taxon_searcher = Taxon_Searcher()
         # Filters
         self.filter = Knowledge_Filter()
@@ -23,7 +23,7 @@ class SearchMaster():
                     if category == 'Q5':
                         self.person_searcher.search(term)
                     elif category == 'Q515' or category == 'Q6256':
-                        self.place_searcher.search(term)
+                        self.country_Searcher.search(term)
                     elif category == 'Q16521':
                         self.taxon_searcher.search(term)
                 except Exception as e:

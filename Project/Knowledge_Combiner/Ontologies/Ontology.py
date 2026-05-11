@@ -10,6 +10,10 @@ class Ontology:
             self.required_properties = []
         if not hasattr(self, "property_map"):
             self.property_map = {}
+        # Same as wikidata
+        if not hasattr(self, "rdf_type"):
+            self.rdf_type = None
+        self.term = terms.term
         self.nx = nx
         #self.validate(terms)
         self.graph = self.build_graph(terms.filtered_data[key_cat], terms.term)

@@ -4,6 +4,7 @@ class Person_Ontology(Ontology):
 
     def __init__(self, terms, key_id, nx = None):
         self.required_properties = ['name']
+        self.rdf_type = "schema:Person"
         self.property_map = {
             "name": "schema:name",
             "birthDate": "schema:birthDate",
@@ -15,5 +16,4 @@ class Person_Ontology(Ontology):
             super().__init__(terms, key_id, nx)
         else:
             super().__init__(terms, key_id)
-        print("Funciona?")
 
