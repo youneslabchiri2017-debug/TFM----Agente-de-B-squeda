@@ -20,6 +20,9 @@ class Category_Searcher():
             results = ddgs.text(term, max_results=max_res)
         return list(map(lambda x: x['href'], results))
 
+    def special_search(self, term):
+        pass
+
     def search(self, term):
         for key in term.data:
             if self.id_cat == key.split('-')[0]:
@@ -33,6 +36,10 @@ class Category_Searcher():
                     print(e)
                 try:
                     term.data[key]['wikipedia'] = self.wikipedia_searcher.search(term.term)
+                except Exception as e:
+                    print(e)
+                try:
+                    term.data[key]['special'] = self.special_search(term)
                 except Exception as e:
                     print(e)
                 try:
