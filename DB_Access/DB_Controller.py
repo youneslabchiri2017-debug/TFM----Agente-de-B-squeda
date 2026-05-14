@@ -28,60 +28,31 @@ class DB_Controller():
         if not os.path.exists('debug_turtles'):
             os.makedirs('debug_turtles')
 
-        for ontology_id in ontologys:
-            ontology_obj = ontologys[ontology_id]
-            rdf_g = Graph()
-
-            # 1. Definimos el Sujeto principal (usando tu Namespace local)
-            # Limpiamos el término de espacios para que sea una URI válida
-            clean_term = ontology_obj.term.replace(" ", "_")
-            main_subject = self.LOCAL[clean_term]
-
-            # 2. Declaramos el tipo (rdf:type)
-            if hasattr(ontology_obj, 'rdf_type'):
-                type_url = ontology_obj.rdf_type.replace("schema:", str(self.SCHEMA))
-                rdf_g.add((main_subject, RDF.type, URIRef(type_url)))
-
-            # 3. Procesamos las aristas del grafo de NetworkX
-            for u, v, attr in ontology_obj.graph.edges(data=True):
-                # IMPORTANTE: replace(" ", "_") es vital para evitar el Error 400
-                sujeto = self.LOCAL[self.clean_for_uri(u)]
-                objeto = self.LOCAL[self.clean_for_uri(v)]
-
-                prop_label = attr['prop']
-
-                if attr['in_pm']:
-                    clean_prop = prop_label.replace("schema:", "").replace(" ", "_")
-                    pred_uri = self.SCHEMA[clean_prop]
-                else:
-                    clean_prop = prop_label.replace(" ", "_")
-                    pred_uri = self.EXTRA[clean_prop]
-
-                rdf_g.add((sujeto, pred_uri, objeto))
-
-            # 4. Serialización
+        for id in ontologys:
             try:
                 # Usamos UTF-8 para evitar errores con tildes o caracteres especiales
-                data_turtle = rdf_g.serialize(format='turtle')
+                data_turtle = ontologys[id].graph.serialize(format='turtle')
 
                 # --- GUARDADO LOCAL PARA DEBUG ---
+                '''
                 file_path = f"debug_turtles/{clean_term}.ttl"
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.write(data_turtle)
                 print(f"Archivo guardado localmente en: {file_path}")
+                '''
                 # ----------------------------------
 
                 # 5. Envío a GraphDB
                 headers = {'Content-Type': 'text/turtle'}
                 response = requests.post(f"{self.url}/statements", data=data_turtle, headers=headers)
 
-                print(f"Ontología {ontology_id} ({ontology_obj.term}) enviada. Status: {response.status_code}")
+                print(f"Ontología {id} ({ontologys[id].term}) enviada. Status: {response.status_code}")
 
                 if response.status_code == 400:
                     print(f"Respuesta del servidor (Error 400): {response.text}")
 
             except Exception as e:
-                print(f"Error procesando ontología {ontology_id}: {e}")
+                print(f"Error procesando ontología {id}: {e}")
 
 
     def load_knowledge(self, term_name):

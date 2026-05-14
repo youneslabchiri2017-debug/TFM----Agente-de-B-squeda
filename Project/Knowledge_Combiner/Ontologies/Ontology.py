@@ -1,11 +1,13 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from networkx.classes import neighbors
+from rdflib import Graph, Literal, RDF, URIRef, Namespace
+from DB_Access.DB_Controller import DB_Controller
+from urllib.parse import quote
 
 
 class Ontology:
 
-    def __init__(self, terms, key_cat, nx = nx):
+    def __init__(self, terms, key_cat, db = DB_Controller(), nx = nx):
         if not hasattr(self, "required_properties"):
             self.required_properties = []
         if not hasattr(self, "property_map"):
@@ -13,28 +15,56 @@ class Ontology:
         # Same as wikidata
         if not hasattr(self, "rdf_type"):
             self.rdf_type = None
+        self.db = db
         self.term = terms.term
         self.nx = nx
-        #self.validate(terms)
+        self.SCHEMA = Namespace("http://schema.org/")
+        self.LOCAL = Namespace("http://tu_proyecto.org/resource/")
+        self.EXTRA = Namespace("http://tu_proyecto.org/properties/extra/")
+        self.url = "http://localhost:7200/repositories/KnowledgeDB"
         self.graph = self.build_graph(terms.filtered_data[key_cat], terms.term)
 
+    def clean_for_uri(self, text):
+        """
+        Convierte cualquier texto en una cadena 100% segura para ser usada como URI.
+        Reemplaza espacios por guiones bajos y codifica símbolos raros.
+        """
+        # 1. Convertimos a string y cambiamos espacios por guiones bajos
+        texto_str = str(text).replace(" ", "_")
+        # 2. quote codifica las comillas, paréntesis, tildes, etc.
+        # El parámetro safe="_-" asegura que no nos modifique los guiones
+        return quote(texto_str, safe="_-")
+
     def build_graph(self, data, term):
-        graph = self.nx.Graph()
-        #Create graph with normal tuples
-        for suj, prop, obj in data[0]:
-            if prop in self.property_map:
-                graph.add_edge(suj, obj, prop=prop, in_pm=True, is_extra=False)
+        main_subject = self.LOCAL[term.replace(" ", "_")]
+        rdf_g = Graph()
+        type_url = self.rdf_type.replace("schema:", str(self.SCHEMA))
+        rdf_g.add((main_subject, RDF.type, URIRef(type_url)))
+        for u, attr, v in data[0]:
+            sujeto = self.LOCAL[self.clean_for_uri(u)]
+            #if self.db.term_exists(term):
+            objeto = self.LOCAL[self.clean_for_uri(v)]
+            if attr in self.property_map:
+                clean_prop = attr.replace("schema:", "").replace(" ", "_")
             else:
-                graph.add_edge(suj, obj, prop=prop, in_pm=False, is_extra=False)
-        #Complete graph with the extra tuples
-        neighbors = list(graph.neighbors(term))
-        for suj, prop, obj in data[1]:
-            for neighborg in neighbors:
-                if suj in neighborg:
-                    graph.add_edge(neighborg, obj, prop=prop, in_pm=False, is_extra=True)
-                if obj in neighborg:
-                    graph.add_edge(neighborg, suj, prop=prop, in_pm=False, is_extra=True)
-        return graph
+                clean_prop = attr.replace(" ", "_")
+            pred_uri = self.SCHEMA[clean_prop]
+
+            rdf_g.add((sujeto, pred_uri, objeto))
+        for u, attr, v in data[1]:
+            sujeto = self.LOCAL[self.clean_for_uri(u)]
+            # if self.db.term_exists(term):
+            objeto = self.LOCAL[self.clean_for_uri(v)]
+            if attr in self.property_map:
+                clean_prop = attr.replace("schema:", "").replace(" ", "_")
+            else:
+                clean_prop = attr.replace(" ", "_")
+            pred_uri = self.EXTRA[clean_prop]
+
+            rdf_g.add((sujeto, pred_uri, objeto))
+        return rdf_g
+
+
 
     def validate(self, data):
         return all(prop in data for prop in self.required_properties)

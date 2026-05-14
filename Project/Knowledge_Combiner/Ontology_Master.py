@@ -20,13 +20,11 @@ class Ontology_Master:
         for key_id in terms.filtered_data:
             cat = key_id.split('-')[0]
             if cat in self.ontologys:
-                ontology = self.ontologys[cat](terms, key_id)
-                #ontology.draw_limited_graph(terms.term)
-                #ontology.draw_graph()
+                ontology = self.ontologys[cat](terms, key_id, self.db_acces)
                 terms.ontologyes[key_id] = ontology
         print(f"Tenemos {len(terms.ontologyes)} ontologias listas")
         if save_g:
-            self.db_acces.save_knowledge(terms.ontologyes)
+            self.save_knowledge(terms.ontologyes)
 
 
     # Combina lo que ya existe con los nuevos datos recolectados
@@ -34,8 +32,8 @@ class Ontology_Master:
         return new_knowledge
 
     # Guarda los grafos nuevos o conocimiento ya existente
-    def save_knowledge(self, graph_knowledge):
-        pass
+    def save_knowledge(self, ontologys):
+        self.db_acces.save_knowledge(ontologys)
 
     # Regresa lo que hay en la base de datos sobre este termino
     def load_knowledge(self, term):

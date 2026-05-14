@@ -21,7 +21,7 @@ class Category_Searcher():
         return list(map(lambda x: x['href'], results))
 
     def special_search(self, term):
-        pass
+        return []
 
     def search(self, term):
         for key in term.data:
@@ -42,8 +42,10 @@ class Category_Searcher():
                     term.data[key]['special'] = self.special_search(term)
                 except Exception as e:
                     print(e)
+                '''
                 try:
                     term.data[key]['web_search'] = self.general_web_searcher.search(term.term)
                 except Exception as e:
                     print(e)
+                '''
 

@@ -3,7 +3,7 @@ from Project.Knowledge_Combiner.Ontologies.Ontology import Ontology
 
 class Taxon_Ontology(Ontology):
 
-    def __init__(self, terms, key_id, nx=None):
+    def __init__(self, terms, key_id, db, nx=None):
         self.required_properties = ['name']
         self.rdf_type = "schema:Taxon"
         self.property_map = {
@@ -14,6 +14,6 @@ class Taxon_Ontology(Ontology):
             "status": "schema:conservationStatus"
         }
         if nx:
-            super().__init__(terms, key_id, nx)
+            super().__init__(terms, key_id, db, nx)
         else:
-            super().__init__(terms, key_id)
+            super().__init__(terms, key_id, db)

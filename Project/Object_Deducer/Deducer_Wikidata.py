@@ -115,3 +115,4 @@ class Deducer_Wikidata(Deducer):
         else:
             #Cargar los datos y luego procesarlos
             print(f"{term_obj.term} is already in the DB")
+            self.db.draw_retrieved_graph(self.db.rdf_to_nx(self.db.load_knowledge(term_obj.term)), term_obj.term)

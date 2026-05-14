@@ -87,7 +87,7 @@ class Taxon_Searcher(Category_Searcher):
             # Verificamos si hay resultados
             if data.get('matchType') == 'NONE':
                 print(f"Aviso: No se encontraron coincidencias para '{name}'")
-                return None
+                return []
 
 
 
@@ -95,4 +95,4 @@ class Taxon_Searcher(Category_Searcher):
 
         except Exception as e:
             print(f"Error al conectar con GBIF: {e}")
-            return None
+            return []
